@@ -1,53 +1,48 @@
-import {
-  useEffect,
-  useRef,
-  useState,
-  useCallback,
-} from 'react';
+import { InputHTMLAttributes, useCallback, useEffect, useRef, useState } from 'react';
 
 import { useField } from '@unform/core';
 
 import { Container } from './styles';
 
-const Input = ({ name, icon: Icon, ...rest }) => {
-  const inputRef = useRef(null);
+interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+	name: string;
+	placeholder: string;
+	icon?: React.ComponentType<{ size: number }>;
+}
 
-  const [isFocused, setIsFocused] = useState(false);
-  const [isFilled, setIsFilled] = useState(false);
+const Input = ({ name, icon: Icon, ...rest }: InputProps) => {
+	const inputRef = useRef<HTMLInputElement>(null);
 
-  const { fieldName, defaultValue, registerField } = useField(name);
+	const [isFocused, setIsFocused] = useState(false);
+	const [isFilled, setIsFilled] = useState(false);
 
-  const handleInputFocus = useCallback(() => {
-    setIsFocused(true);
-  }, []);
+	const { fieldName, defaultValue, registerField } = useField(name);
 
-  const handleInputBlur = useCallback(() => {
-    setIsFocused(false);
+	const handleInputFocus = useCallback(() => {
+		setIsFocused(true);
+	}, []);
 
-    setIsFilled(!!inputRef.current?.value);
-  }, []);
+	const handleInputBlur = useCallback(() => {
+		setIsFocused(false);
 
-  useEffect(() => {
-    registerField({
-      name: fieldName,
-      ref: inputRef.current,
-      path: 'value',
-    });
-  }, [fieldName, registerField]);
+		setIsFilled(!!inputRef.current?.value);
+	}, []);
 
-  return (
-    <Container isFilled={isFilled} isFocused={isFocused}>
-      {Icon && <Icon size={20} />}
+	useEffect(() => {
+		registerField({
+			name: fieldName,
+			ref: inputRef.current,
+			path: 'value',
+		});
+	}, [fieldName, registerField]);
 
-      <input
-        onFocus={handleInputFocus}
-        onBlur={handleInputBlur}
-        defaultValue={defaultValue}
-        ref={inputRef}
-        {...rest}
-      />
-    </Container>
-  );
+	return (
+		<Container isFilled={isFilled} isFocused={isFocused}>
+			{Icon && <Icon size={20} />}
+
+			<input onFocus={handleInputFocus} onBlur={handleInputBlur} defaultValue={defaultValue} ref={inputRef} {...rest} />
+		</Container>
+	);
 };
 
 export default Input;
